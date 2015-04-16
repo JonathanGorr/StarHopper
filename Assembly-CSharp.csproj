@@ -5,7 +5,7 @@
 	<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
 	<ProductVersion>10.0.20506</ProductVersion>
 	<SchemaVersion>2.0</SchemaVersion>
-	<ProjectGuid>{6E40A7F9-3F14-2A31-95DD-A336F78051DC}</ProjectGuid>
+	<ProjectGuid>{5915839C-BAB0-C2AA-83DF-D482FB21A09A}</ProjectGuid>
 	<OutputType>Library</OutputType>
 	<AppDesignerFolder>Properties</AppDesignerFolder>
 	<RootNamespace></RootNamespace>
@@ -39,17 +39,13 @@
 	<Reference Include="System.Core" />
 	<Reference Include="System.Xml.Linq" />
 	<Reference Include="UnityEngine">
-	  <HintPath>D:/Unity/Editor/Data/Managed/UnityEngine.dll</HintPath>
+	  <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine.dll</HintPath>
 	</Reference>
 	<Reference Include="UnityEditor">
-	  <HintPath>D:/Unity/Editor/Data/Managed/UnityEditor.dll</HintPath>
+	  <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEditor.dll</HintPath>
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Example Games\Angry Birds Style\Scripts\ProjectileDragging.cs" />
-     <Compile Include="Assets\Example Games\Angry Birds Style\Scripts\ProjectileFollow.cs" />
-     <Compile Include="Assets\Example Games\Angry Birds Style\Scripts\Resetter.cs" />
-     <Compile Include="Assets\Example Games\Angry Birds Style\Scripts\TargetDamage.cs" />
      <Compile Include="Assets\Scripts\Camera\CameraSmoothFollow.cs" />
      <Compile Include="Assets\Scripts\Camera\PinchZoom.cs" />
      <Compile Include="Assets\Scripts\Collectables\Collectable.cs" />
@@ -61,19 +57,10 @@
      <Compile Include="Assets\Scripts\Player\PlayerController.cs" />
      <Compile Include="Assets\Scripts\Player\SpriteRotation.cs" />
      <Compile Include="Assets\Scripts\SFX.cs" />
-     <Compile Include="Assets\Scripts\SourceFollowProjectile.cs" />
-     <Compile Include="Assets\Scripts\TutorialScripts\Acceleration.cs" />
-     <Compile Include="Assets\Scripts\TutorialScripts\BasicTouch.cs" />
-     <Compile Include="Assets\Scripts\TutorialScripts\DotInput.cs" />
-     <Compile Include="Assets\Scripts\TutorialScripts\MultiTouch.cs" />
-     <Compile Include="Assets\Scripts\TutorialScripts\Planet.cs" />
-     <Compile Include="Assets\Scripts\TutorialScripts\SingleTouch.cs" />
-     <Compile Include="Assets\Scripts\TutorialScripts\StarX.cs" />
      <Compile Include="Assets\Scripts\UI\DisplayScore.cs" />
      <Compile Include="Assets\Scripts\UI\UIButtonHold.cs" />
-     <None Include="Assets\Example Games\Angry Birds Style\_ReadMe.txt" />
  <Reference Include="UnityEngine.UI">
- <HintPath>D:/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
+ <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -30,11 +30,29 @@ public class Player : MonoBehaviour {
 	private Slider slider;
 	private ParticleSystem particles;
 	private LevelManager manager;
-	private Rigidbody2D rigidBody;
-
+	
 	public Color dyingColor;
 
+	//rotation
+	public float rotationSpeed = 100f;
+
+	//gizmos
+	public Color 
+		planetLinesColor,
+		closestPlanetColor;
+	public bool
+		planetLines,
+		closestPlanetLine;
+
+	//planets
+	private GameObject closest;
+	private Rigidbody2D rigidBody;
+	GameObject[] planets;
+
 	void Awake() {
+
+		//find all planets
+		planets = GameObject.FindGameObjectsWithTag("Planet");
 
 		//import
 		controller = GetComponent<PlayerController>();
@@ -48,7 +66,18 @@ public class Player : MonoBehaviour {
 		particles.enableEmission = false;
 	}
 
+	void Update()
+	{
+		//FindClosestPlanet ();
+	}
+
 	void FixedUpdate() {
+
+		//if standing on a planet, inherit its rotation
+		if (grounded) {
+			transform.parent = FindClosestPlanet().transform;
+		} else
+			transform.parent = null;
 
 		//movement
 		float forceX = 0f;
@@ -113,6 +142,33 @@ public class Player : MonoBehaviour {
 			Invoke("ChangeColor", 1f);
 
 		GetComponent<Rigidbody2D>().AddRelativeForce(new Vector2(forceX, forceY));
+
+		//rotate towards nearest planet
+		Vector3 vectorToTarget = FindClosestPlanet().transform.position - transform.position;
+		float angle = (Mathf.Atan2(vectorToTarget.y, vectorToTarget.x) * Mathf.Rad2Deg) + 90;
+		Quaternion q = Quaternion.AngleAxis(angle, Vector3.forward);
+		transform.rotation = Quaternion.Slerp(transform.rotation, q, Time.deltaTime * rotationSpeed);
+	}
+
+	GameObject FindClosestPlanet()
+	{
+		//closest planet
+		float closestDist = Mathf.Infinity;
+		
+		//do to each planet in tag array
+		foreach(GameObject planet in planets) {
+			
+			//what is distance?
+			float dist = Vector3.Distance(planet.transform.position, transform.position);
+			
+			//if current planet distance is the least...look at it
+			if (dist <= closestDist)
+			{
+				closestDist = dist;
+				closest = planet;
+			}
+		}
+		return closest;
 	}
 
 	private void RecoverFuel()

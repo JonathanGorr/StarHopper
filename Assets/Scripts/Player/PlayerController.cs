@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour {
 
+	[HideInInspector]
 	public Vector2 moving = new Vector2();
 
 	private UIButtonHold
