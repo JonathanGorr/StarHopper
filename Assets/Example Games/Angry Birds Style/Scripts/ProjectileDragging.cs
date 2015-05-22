@@ -4,7 +4,6 @@ public class ProjectileDragging : MonoBehaviour {
 
 	public float maxStretch = 3.0f;
 	public LineRenderer catapultLine;
-	private BoxCollider2D boxCollider;
 	public bool dragging;
 
 	private SpringJoint2D spring;
@@ -20,7 +19,6 @@ public class ProjectileDragging : MonoBehaviour {
 	{
 		//get spring component
 		spring = GetComponent<SpringJoint2D>();
-		boxCollider = GetComponent<BoxCollider2D>();
 
 		//catapult is the thing to which the spring is attached
 		catapult = spring.connectedBody.transform;

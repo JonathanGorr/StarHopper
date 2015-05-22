@@ -4,6 +4,8 @@ using UnityEngine.UI;
 
 public class Player : MonoBehaviour {
 
+	public Vector2 moving = new Vector2();
+
 	public float 
 		moveSpeed = 50,
 		jumpSpeed = 100,
@@ -11,7 +13,8 @@ public class Player : MonoBehaviour {
 		airSpeedMultiplier = 0.3f,
 		duration = 5f,
 		recoverSpeed = 1f,
-		depleteSpeed = 1f;
+		depleteSpeed = 1f,
+		rotationSpeed = 200f;
 
 	//sounds
 	public AudioClip leftFootSound;
@@ -25,21 +28,23 @@ public class Player : MonoBehaviour {
 	public Transform groundedPosition;
 
 	private Vector3 moveDirection;
-	private PlayerController controller;
 	private Animator anim;
-	private Slider slider;
+	private Slider fuel;
 	private ParticleSystem particles;
 	private LevelManager manager;
 	private Rigidbody2D rigidBody;
+	private PlayerInput input;
+	private RotateTowardsPlanet planetRotate;
 
 	public Color dyingColor;
 
 	void Awake() {
 
 		//import
-		controller = GetComponent<PlayerController>();
+		planetRotate = GameObject.Find("Player").GetComponent<RotateTowardsPlanet> ();
+		input = GameObject.Find ("LevelManager").GetComponent<PlayerInput> ();
 		anim = GetComponent<Animator>();
-		slider = GameObject.Find("Fuel").GetComponent<Slider>();
+		fuel = GameObject.Find("Fuel").GetComponent<Slider>();
 		particles = GetComponentInChildren<ParticleSystem>();
 		manager = GameObject.Find("LevelManager").GetComponent<LevelManager>();
 		rigidBody = GetComponent<Rigidbody2D>();
@@ -48,7 +53,47 @@ public class Player : MonoBehaviour {
 		particles.enableEmission = false;
 	}
 
-	void FixedUpdate() {
+	void Update() {
+
+		//reset
+		moving.x = moving.y = 0;
+		
+		//if within range of a planet, move normally
+		if(!planetRotate.tooFar)
+		{
+			//horizontal
+			if(input.left)
+			{
+				moving.x = -1;
+			}
+			else if(input.right)
+			{
+				moving.x = 1;
+			}
+		}
+		
+		//else if in outter space...
+		else
+		{
+			if(input.left)
+			{
+				print("rotating");
+				transform.Rotate(Vector3.forward * rotationSpeed * Time.deltaTime);
+			}
+			
+			else if(input.right)
+				transform.Rotate(Vector3.back * rotationSpeed * Time.deltaTime);
+		}
+		
+		//vertical
+		if(input.up)
+		{
+			moving.y = 1;
+		}
+		else if(input.down)
+		{
+			moving.y = -1;
+		}
 
 		//movement
 		float forceX = 0f;
@@ -60,64 +105,66 @@ public class Player : MonoBehaviour {
 		//if the ground object enters any objects with a 'ground' layer name, set grounded to true
 		grounded = Physics2D.Linecast(transform.position, groundedPosition.position, 1 << LayerMask.NameToLayer("Ground") );
 
-		if(controller.moving.x != 0)
+		//if moving...
+		if(moving.x != 0)
 		{
 			if(absVelX < maxVelocity.x)
 			{
-				forceX = grounded ? moveSpeed * controller.moving.x : (moveSpeed * controller.moving.x * airSpeedMultiplier);
+				forceX = grounded ? moveSpeed * moving.x : (moveSpeed * moving.x * airSpeedMultiplier);
 
 				//flipping- if forcex is greater than 0, set to either 1 or -1
 				transform.localScale = new Vector3(forceX > 0 ? 1 : -1, 1, 1);
 			}
-			//animation state
+
+			//walking state
 			anim.SetInteger("AnimState", 1);
 		}
 
+		//if not moving
 		else
 		{
-			//animation state
+			//idle state
 			anim.SetInteger("AnimState", 0);
 		}
 
 		//jetpacking
-		if(slider.value != 0)
+		if(fuel.value != 0)
 		{
-			if(controller.moving.y > 0)
+			if(moving.y > 0)
 			{
 				PlayRocketSound();
 
 				if(absVelY < maxVelocity.y)
-					forceY = jetSpeed * controller.moving.y;
+					forceY = jetSpeed * moving.y;
 
 				//use fuel
-				slider.value -= depleteSpeed;
+				fuel.value -= depleteSpeed;
 
 				particles.enableEmission = true;
 
 				anim.SetInteger("AnimState", 2);
 			}
 			else
-			{
 				particles.enableEmission = false;
-			}
 		}
 		else
 			particles.enableEmission = false;
 
 		//go blue if lost in space
 		if(grounded)
-		{
 			RecoverFuel();
-		}
 		else
+		{
+			print("go blue");
 			Invoke("ChangeColor", 1f);
+		}
 
-		GetComponent<Rigidbody2D>().AddRelativeForce(new Vector2(forceX, forceY));
+		rigidBody.AddRelativeForce(new Vector2(forceX, forceY));
 	}
 
 	private void RecoverFuel()
 	{
-		slider.value += recoverSpeed;
+		fuel.value += recoverSpeed;
 	}
 
 	private void ChangeColor()
@@ -127,13 +174,9 @@ public class Player : MonoBehaviour {
 		GetComponent<Renderer>().material.color = Color.Lerp(Color.white, dyingColor, t);
 
 		if(t < 1)
-		{
 			t += Time.deltaTime/duration;
-		}
 		else if(t > duration)
-		{
 			print("dead");
-		}
 	}
 
 	void PlayLeftFootSound()
@@ -171,27 +214,21 @@ public class Player : MonoBehaviour {
 			float absVelY = Mathf.Abs(rigidBody.velocity.y);
 
 			if(absVelX <= .1f || absVelY <= .1f)
-			{
 				if(thudSound)
 					AudioSource.PlayClipAtPoint(thudSound, transform.position);
-			}
 		}
 	}
 
 	void OnTriggerEnter2D(Collider2D other)
 	{
 		if(other.gameObject.tag == "Finish")
-		{
 			manager.Depart();
-		}
 	}
 
 	void OnTriggerExit2D(Collider2D other)
 	{
 		if(other.gameObject.tag == "Finish")
-		{
 			manager.Suppress();
-		}
 	}
 
 	void OnDrawGizmos()

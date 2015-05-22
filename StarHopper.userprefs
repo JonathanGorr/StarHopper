@@ -1,0 +1,14 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Player\Player.cs">
+    <Files>
+      <File FileName="Assets\Scripts\LevelManager.cs" Line="165" Column="12" />
+      <File FileName="Assets\Scripts\Player\PlayerInput.cs" Line="23" Column="3" />
+      <File FileName="Assets\Scripts\Player\Player.cs" Line="170" Column="28" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 6b2c68fef9f423c4ca988c03d0a7fdfc
-timeCreated: 1426108965
+timeCreated: 1428187393
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -18,6 +18,7 @@ TextureImporter:
     21300022: UI_11
     21300024: UI_12
     21300026: UI_13
+    21300028: UI_14
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -106,9 +107,9 @@ TextureImporter:
     - name: UI_4
       rect:
         serializedVersion: 2
-        x: 32
+        x: 134
         y: 525
-        width: 156
+        width: 40
         height: 40
       alignment: 0
       pivot: {x: .5, y: .5}
@@ -200,6 +201,16 @@ TextureImporter:
         y: 188
         width: 16
         height: 23
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: UI_14
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 533
+        width: 13
+        height: 24
       alignment: 0
       pivot: {x: .5, y: .5}
       border: {x: 0, y: 0, z: 0, w: 0}

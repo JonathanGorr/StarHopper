@@ -4,8 +4,7 @@ using UnityEngine.UI;
 
 public class LevelManager : MonoBehaviour {
 
-	[HideInInspector]
-	public int coins, parts;
+	[HideInInspector] public int coins, parts;
 
 	public int maxParts;
 
@@ -37,9 +36,12 @@ public class LevelManager : MonoBehaviour {
 		rocketText,
 		levelText;
 
+	private PlayerInput input;
+
 	private void Awake()
 	{
 		//Find ui groups
+		input = GetComponent<PlayerInput> ();
 		player = GameObject.Find("Player");
 		gameUI = GameObject.Find("GameUI");
 		titleUI = GameObject.Find("TitleUI");
@@ -57,7 +59,7 @@ public class LevelManager : MonoBehaviour {
 		controls = GameObject.Find("Controls");
 
 		//set oxygen max to current start supply
-		oxygenBar.maxValue = time;
+		//oxygenBar.maxValue = time;
 
 		//mobile controls toggle
 		/*
@@ -74,53 +76,32 @@ public class LevelManager : MonoBehaviour {
 		{
 			levelText.text = "";
 
-			if(gameUI)
-				gameUI.SetActive(false);
-
-			if(tutorialUI)
-				tutorialUI.SetActive(false);
-
-			if(titleUI)
-				titleUI.SetActive(true);
+			gameUI.SetActive(false);
+			tutorialUI.SetActive(false);
+			titleUI.SetActive(true);
 		}
 		else if(Application.loadedLevelName == "Intro")
 		{
 			levelText.text = "";
 
-			if(gameUI)
-				gameUI.SetActive(true);
-			
-			if(tutorialUI)
-				tutorialUI.SetActive(true);
-
-			if(titleUI)
-				titleUI.SetActive(false);
+			gameUI.SetActive(true);
+			tutorialUI.SetActive(true);
+			titleUI.SetActive(false);
 		}
-
 		//else reveal ui elements
 		else
 		{
 			levelText.text = Application.loadedLevelName.ToString();
 
-			if(gameUI)
-				gameUI.SetActive(true);
-			
-			if(tutorialUI)
-				tutorialUI.SetActive(false);
-			
-			if(titleUI)
-				titleUI.SetActive(false);
+			gameUI.SetActive(true);
+			tutorialUI.SetActive(false);
+			titleUI.SetActive(false);
 		}
 
 		//set these off by default
-		if(rocketMenu)
-			rocketMenu.SetActive(false);
-
-		if(pauseMenu)
-			pauseMenu.SetActive(false);
-
-		if(deathMessage)
-			deathMessage.text = "";
+		rocketMenu.SetActive(false);
+		pauseMenu.SetActive(false);
+		deathMessage.text = "";
 
 		//framerate
 		Application.targetFrameRate = 60;
@@ -128,12 +109,18 @@ public class LevelManager : MonoBehaviour {
 
 	void Update()
 	{
+		//if not on mobile, hide touch controls
+		if (Application.platform != RuntimePlatform.WindowsPlayer)
+			controls.SetActive (false);
+		else
+			controls.SetActive (true);
+
 		//restart
-		if(Input.GetKeyDown(KeyCode.R))
+		if(input.restart)
 			Restart();
 
 		//esc to pause
-		if(Input.GetKeyDown(KeyCode.Escape))
+		if(input.pause)
 		{
 			//toggle
 			paused = !paused;
@@ -172,7 +159,8 @@ public class LevelManager : MonoBehaviour {
 			rocketText.text = "Leave Solar System?";
 		}
 
-		switch((int) oxygenBar.value)
+		//Timeleft------------------------------------------
+		switch((int) time)
 		{
 			case 30:
 				timeLeft.text = "30 Seconds Left!";
@@ -195,6 +183,7 @@ public class LevelManager : MonoBehaviour {
 				break;
 		}
 
+		//kill state
 		if(time <= 0)
 		{
 			deathMessage.text = "You asphyxiated!";
@@ -237,10 +226,9 @@ public class LevelManager : MonoBehaviour {
 	{
 		mapOn = !mapOn;
 
-		if(mapOn)
-			miniMap.SetActive(true);
-		else
-			miniMap.SetActive(false);
+		if(mapOn) miniMap.SetActive(true);
+
+		else miniMap.SetActive(false);
 	}
 
 	public void Resume()
