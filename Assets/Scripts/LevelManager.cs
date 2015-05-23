@@ -25,7 +25,6 @@ public class LevelManager : MonoBehaviour {
 		titleUI,
 		gameUI,
 		tutorialUI,
-		player,
 		rocketMenuChoices,
 		controls;
 
@@ -42,7 +41,6 @@ public class LevelManager : MonoBehaviour {
 	{
 		//Find ui groups
 		input = GetComponent<PlayerInput> ();
-		player = GameObject.Find("Player");
 		gameUI = GameObject.Find("GameUI");
 		titleUI = GameObject.Find("TitleUI");
 		tutorialUI = GameObject.Find("TutorialUI");
@@ -57,19 +55,6 @@ public class LevelManager : MonoBehaviour {
 		rocketMenuChoices = GameObject.Find("Choices");
 		levelText = GameObject.Find("LevelText").GetComponent<Text>();
 		controls = GameObject.Find("Controls");
-
-		//set oxygen max to current start supply
-		//oxygenBar.maxValue = time;
-
-		//mobile controls toggle
-		/*
-		if(mobile)
-		{
-			controls.SetActive(true);
-		}
-		else
-			controls.SetActive(false);
-		*/
 
 		//if on the titleScreen, hide most
 		if(Application.loadedLevelName == "Title")
@@ -132,13 +117,6 @@ public class LevelManager : MonoBehaviour {
 		}
 	}
 
-	//calculate how many more parts are needed
-	int PartsLeft()
-	{
-		int partsLeft = maxParts - parts;
-		return partsLeft;
-	}
-
 	void FixedUpdate()
 	{
 		//oxygen bar
@@ -165,19 +143,15 @@ public class LevelManager : MonoBehaviour {
 			case 30:
 				timeLeft.text = "30 Seconds Left!";
 				break;
-
 			case 15:
 				timeLeft.text = "15 Seconds Left!";
 				break;
-
 			case 10:
 				timeLeft.text = "10 Seconds Left!";
 				break;
-
 			case 5:
 				timeLeft.text = "5 Seconds Left!";
 				break;
-
 			default:
 				timeLeft.text = "";
 				break;
@@ -185,11 +159,14 @@ public class LevelManager : MonoBehaviour {
 
 		//kill state
 		if(time <= 0)
-		{
-			deathMessage.text = "You asphyxiated!";
-			Destroy(player);
-			Invoke("Restart", 2f);
-		}
+			Kill ();
+	}
+
+	public void Kill()
+	{
+		deathMessage.text = "You asphyxiated!";
+		GetComponent<PlayerInput> ().enabled = false;
+		Invoke("Restart", 2f);
 	}
 
 	public void Pause()
@@ -210,6 +187,13 @@ public class LevelManager : MonoBehaviour {
 			coins ++;
 		else if(name == "Parts")
 			parts++;
+	}
+
+	//calculate how many more parts are needed
+	int PartsLeft()
+	{
+		int partsLeft = maxParts - parts;
+		return partsLeft;
 	}
 
 	public void Depart()

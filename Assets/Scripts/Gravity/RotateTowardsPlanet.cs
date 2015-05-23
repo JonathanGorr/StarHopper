@@ -4,8 +4,6 @@ using System.Collections;
 public class RotateTowardsPlanet : MonoBehaviour {
 		
 	public float
-		maxGravDist = 4.0f,
-		maxGravity = 35.0f,
 		rotationSpeed = 100f,
 		tooFarDistance = 20f;
 

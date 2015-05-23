@@ -4,17 +4,18 @@ using UnityEngine.UI;
 
 public class Player : MonoBehaviour {
 
-	public Vector2 moving = new Vector2();
-
-	public float 
+	//variable floats
+	public float
 		moveSpeed = 50,
-		jumpSpeed = 100,
 		jetSpeed = 15f,
 		airSpeedMultiplier = 0.3f,
 		duration = 5f,
 		recoverSpeed = 1f,
-		depleteSpeed = 1f,
-		rotationSpeed = 200f;
+		fuelDepleteSpeed = 1f,
+		noAirDepleteSpeed = .2f,
+		gasGiantDepleteSpeed = .5f,
+		rotationSpeed = 200f,
+		t;
 
 	//sounds
 	public AudioClip leftFootSound;
@@ -22,29 +23,40 @@ public class Player : MonoBehaviour {
 	public AudioClip thudSound;
 	public AudioClip rocketSound;
 
+	//bools
 	public bool grounded;
 
+	//vectors
 	public Vector2 maxVelocity = new Vector2(3,5);
 	public Transform groundedPosition;
-
 	private Vector3 moveDirection;
+	private Vector2 moving = new Vector2();
+
+	//components
 	private Animator anim;
-	private Slider fuel;
 	private ParticleSystem particles;
 	private LevelManager manager;
 	private Rigidbody2D rigidBody;
 	private PlayerInput input;
 	private RotateTowardsPlanet planetRotate;
 
+	private GameObject playerCanvas;
+
+	//bars
+	private Slider fuel, health;
+
+	//colors
 	public Color dyingColor;
 
 	void Awake() {
 
 		//import
+		playerCanvas = GameObject.Find ("PlayerCanvas");
 		planetRotate = GameObject.Find("Player").GetComponent<RotateTowardsPlanet> ();
 		input = GameObject.Find ("LevelManager").GetComponent<PlayerInput> ();
 		anim = GetComponent<Animator>();
 		fuel = GameObject.Find("Fuel").GetComponent<Slider>();
+		health = GameObject.Find("Health").GetComponent<Slider>();
 		particles = GetComponentInChildren<ParticleSystem>();
 		manager = GameObject.Find("LevelManager").GetComponent<LevelManager>();
 		rigidBody = GetComponent<Rigidbody2D>();
@@ -55,6 +67,16 @@ public class Player : MonoBehaviour {
 
 	void Update() {
 
+		//movement----------------------------------------------------------------------
+		float forceX = 0f;
+		float forceY = 0f;
+		
+		float absVelX = Mathf.Abs(rigidBody.velocity.x);
+		float absVelY = Mathf.Abs(rigidBody.velocity.y);
+
+		//change color if in space
+		ChangeColor();
+
 		//reset
 		moving.x = moving.y = 0;
 		
@@ -62,50 +84,31 @@ public class Player : MonoBehaviour {
 		if(!planetRotate.tooFar)
 		{
 			//horizontal
-			if(input.left)
-			{
+			if(input.left) 
 				moving.x = -1;
-			}
-			else if(input.right)
-			{
+			else if(input.right) 
 				moving.x = 1;
-			}
 		}
 		
 		//else if in outter space...
 		else
 		{
-			if(input.left)
-			{
-				print("rotating");
+			if(input.left) 
 				transform.Rotate(Vector3.forward * rotationSpeed * Time.deltaTime);
-			}
-			
-			else if(input.right)
+			else if(input.right) 
 				transform.Rotate(Vector3.back * rotationSpeed * Time.deltaTime);
 		}
 		
-		//vertical
-		if(input.up)
-		{
+		//up and down
+		if(input.up) 
 			moving.y = 1;
-		}
 		else if(input.down)
-		{
 			moving.y = -1;
-		}
-
-		//movement
-		float forceX = 0f;
-		float forceY = 0f;
-
-		float absVelX = Mathf.Abs(rigidBody.velocity.x);
-		float absVelY = Mathf.Abs(rigidBody.velocity.y);
 
 		//if the ground object enters any objects with a 'ground' layer name, set grounded to true
 		grounded = Physics2D.Linecast(transform.position, groundedPosition.position, 1 << LayerMask.NameToLayer("Ground") );
 
-		//if moving...
+		//calculate force
 		if(moving.x != 0)
 		{
 			if(absVelX < maxVelocity.x)
@@ -116,18 +119,17 @@ public class Player : MonoBehaviour {
 				transform.localScale = new Vector3(forceX > 0 ? 1 : -1, 1, 1);
 			}
 
-			//walking state
-			anim.SetInteger("AnimState", 1);
+			if(grounded)
+			{
+				//walking state
+				anim.SetInteger("AnimState", 1);
+			}
 		}
-
-		//if not moving
+		//if not moving, idle anim
 		else
-		{
-			//idle state
 			anim.SetInteger("AnimState", 0);
-		}
 
-		//jetpacking
+		//jetpacking---------------------------------------------------------------
 		if(fuel.value != 0)
 		{
 			if(moving.y > 0)
@@ -138,7 +140,7 @@ public class Player : MonoBehaviour {
 					forceY = jetSpeed * moving.y;
 
 				//use fuel
-				fuel.value -= depleteSpeed;
+				fuel.value -= fuelDepleteSpeed;
 
 				particles.enableEmission = true;
 
@@ -150,33 +152,51 @@ public class Player : MonoBehaviour {
 		else
 			particles.enableEmission = false;
 
-		//go blue if lost in space
-		if(grounded)
-			RecoverFuel();
-		else
-		{
-			print("go blue");
-			Invoke("ChangeColor", 1f);
-		}
+		//go blue if lost in space----------------------------------------
+		if(grounded) RecoverFuel();
 
 		rigidBody.AddRelativeForce(new Vector2(forceX, forceY));
+
+		if (health.value <= 0)
+			Kill ();
 	}
 
-	private void RecoverFuel()
+	void RecoverFuel()
 	{
 		fuel.value += recoverSpeed;
 	}
 
-	private void ChangeColor()
+	void ChangeColor()
 	{
-		float t = 0;
+		GetComponent<SpriteRenderer>().material.color = Color.Lerp(Color.white, dyingColor, t);
 
-		GetComponent<Renderer>().material.color = Color.Lerp(Color.white, dyingColor, t);
+		float min = 0;
+		float max = 1;
 
-		if(t < 1)
-			t += Time.deltaTime/duration;
-		else if(t > duration)
-			print("dead");
+		//clamp
+		if (t > max) 
+			t = max;
+		else if (t < min) 
+			t = min;
+
+		if(grounded)
+		{
+			if(t > min)
+				t -= Time.deltaTime/duration * 4; //recover oxygen faster when on planet
+		}
+		else if(!grounded)
+		{
+			if(t < max)
+				t += Time.deltaTime/duration;
+		}
+
+		if (t >= max) 
+		{
+			if(playerCanvas) playerCanvas.GetComponent<Animator> ().SetInteger ("AnimState", 1);
+			health.value -= noAirDepleteSpeed;
+		}
+		else
+			if(playerCanvas) playerCanvas.GetComponent<Animator>().SetInteger ("AnimState", 0);
 	}
 
 	void PlayLeftFootSound()
@@ -225,6 +245,16 @@ public class Player : MonoBehaviour {
 			manager.Depart();
 	}
 
+	void OnTriggerStay2D(Collider2D other)
+	{
+		if (other.gameObject.tag == "Damager") 
+		{
+			print("Damaging");
+
+			health.value -= gasGiantDepleteSpeed;
+		}
+	}
+
 	void OnTriggerExit2D(Collider2D other)
 	{
 		if(other.gameObject.tag == "Finish")
@@ -235,6 +265,13 @@ public class Player : MonoBehaviour {
 	{
 		Gizmos.color = Color.yellow;
 		Gizmos.DrawLine(transform.position, groundedPosition.position);
+	}
+
+	void Kill()
+	{
+		Destroy (playerCanvas);
+		//Destroy (gameObject);
+		manager.Kill ();
 	}
 	
 }

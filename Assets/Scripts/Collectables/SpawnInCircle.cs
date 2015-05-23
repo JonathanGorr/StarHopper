@@ -25,7 +25,7 @@ public class SpawnInCircle : MonoBehaviour {
 
 	void Awake () {
 
-		circleCollider = GetComponent<CircleCollider2D>();
+		circleCollider = transform.Find("Planet").GetComponent<CircleCollider2D>();
 
 		//radius is circle collider radius * the scale of the sprite
 		radiusY = radiusX = circleCollider.radius * transform.localScale.x + offset;
@@ -45,9 +45,8 @@ public class SpawnInCircle : MonoBehaviour {
 			//position for the point prefab
 			if(vertical)
 				pointPos = new Vector3(x, y)+centerPos;
-			else if (!vertical){
+			else if (!vertical)
 				pointPos = new Vector3(x, 0, y)+centerPos;
-			}
 
 			if(spawnCoins)
 			{
