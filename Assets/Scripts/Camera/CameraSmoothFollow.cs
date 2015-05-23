@@ -18,11 +18,12 @@ public class CameraSmoothFollow : MonoBehaviour {
 	private Quaternion currentRotation;
 	private Quaternion targetRotation;
 
-	void Start()
+	void Awake()
 	{
+		transform.position = target.position;
 		oldRotation = target.rotation;
 	}
-	
+
 	void  FixedUpdate ()
 	{
 		// Early out if we don't have a target

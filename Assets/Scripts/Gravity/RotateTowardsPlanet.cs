@@ -22,7 +22,7 @@ public class RotateTowardsPlanet : MonoBehaviour {
 	
 	GameObject[] planets;
 	
-	void Awake () {
+	void Start () {
 
 		//get all the planets
 		planets = GameObject.FindGameObjectsWithTag("Planet");

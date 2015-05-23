@@ -6,7 +6,7 @@ public class LevelManager : MonoBehaviour {
 
 	[HideInInspector] public int coins, parts;
 
-	public int maxParts;
+	[HideInInspector] public GameObject[] maxParts;
 
 	private Slider oxygenBar;
 	public float time = 60f;
@@ -33,7 +33,9 @@ public class LevelManager : MonoBehaviour {
 		timeLeft,
 		deathMessage,
 		rocketText,
-		levelText;
+		levelText,
+		scoreText,
+		partsText;
 
 	private PlayerInput input;
 
@@ -90,6 +92,18 @@ public class LevelManager : MonoBehaviour {
 
 		//framerate
 		Application.targetFrameRate = 60;
+
+		//ScoreText-----
+		if(Application.loadedLevelName != "Title")
+		{
+			scoreText = transform.Find("UI/GameUI/Score").GetComponent<Text>();
+			partsText = transform.Find("UI/GameUI/Parts").GetComponent<Text>();
+		}
+	}
+
+	void Start()
+	{
+		maxParts = GameObject.FindGameObjectsWithTag ("Part");
 	}
 
 	void Update()
@@ -125,8 +139,18 @@ public class LevelManager : MonoBehaviour {
 		//timer
 		timer.text = Mathf.Round(oxygenBar.value).ToString();
 
+		//display coins and parts
+		if(Application.loadedLevelName != "Title")
+		{
+			scoreText.text = "$" + coins.ToString();
+			
+			//display current number of parts + / + parts in level
+			//TODO: Count number of parts in scene by using gameobject.findobjectsbytag("parts").count or something;
+			partsText.text = parts.ToString() + "/" + maxParts.Length.ToString();
+		}
+
 		//parts
-		if(parts < maxParts)
+		if(parts < maxParts.Length)
 		{
 			rocketMenuChoices.SetActive(false);
 			rocketText.text = "You need " + PartsLeft() + " more parts.";
@@ -192,7 +216,7 @@ public class LevelManager : MonoBehaviour {
 	//calculate how many more parts are needed
 	int PartsLeft()
 	{
-		int partsLeft = maxParts - parts;
+		int partsLeft = maxParts.Length - parts;
 		return partsLeft;
 	}
 

@@ -14,8 +14,9 @@ public class Player : MonoBehaviour {
 		fuelDepleteSpeed = 1f,
 		noAirDepleteSpeed = .2f,
 		gasGiantDepleteSpeed = .5f,
-		rotationSpeed = 200f,
-		t;
+		rotationSpeed = 2;
+
+	private float t;
 
 	//sounds
 	public AudioClip leftFootSound;
@@ -24,7 +25,7 @@ public class Player : MonoBehaviour {
 	public AudioClip rocketSound;
 
 	//bools
-	public bool grounded;
+	private bool grounded;
 
 	//vectors
 	public Vector2 maxVelocity = new Vector2(3,5);
@@ -40,6 +41,7 @@ public class Player : MonoBehaviour {
 	private PlayerInput input;
 	private RotateTowardsPlanet planetRotate;
 
+	//gameobjects
 	private GameObject playerCanvas;
 
 	//bars
@@ -63,6 +65,11 @@ public class Player : MonoBehaviour {
 
 		//particles are off by default
 		particles.enableEmission = false;
+	}
+
+	void Start()
+	{
+		transform.position = GameObject.Find ("Start(Clone)").transform.position + new Vector3(0, .5f, 0);
 	}
 
 	void Update() {
@@ -94,9 +101,9 @@ public class Player : MonoBehaviour {
 		else
 		{
 			if(input.left) 
-				transform.Rotate(Vector3.forward * rotationSpeed * Time.deltaTime);
+				transform.Rotate(Vector3.forward * rotationSpeed * 100 * Time.deltaTime);
 			else if(input.right) 
-				transform.Rotate(Vector3.back * rotationSpeed * Time.deltaTime);
+				transform.Rotate(Vector3.back * rotationSpeed * 100 * Time.deltaTime);
 		}
 		
 		//up and down
@@ -128,6 +135,11 @@ public class Player : MonoBehaviour {
 		//if not moving, idle anim
 		else
 			anim.SetInteger("AnimState", 0);
+
+		if(rigidBody.velocity.magnitude > maxVelocity.x)
+		{
+			rigidBody.velocity = rigidBody.velocity.normalized * maxVelocity.x;
+		}
 
 		//jetpacking---------------------------------------------------------------
 		if(fuel.value != 0)
@@ -230,6 +242,8 @@ public class Player : MonoBehaviour {
 	{
 		if(!grounded)
 		{
+			transform.parent = null;
+
 			float absVelX = Mathf.Abs(rigidBody.velocity.x);
 			float absVelY = Mathf.Abs(rigidBody.velocity.y);
 
@@ -237,6 +251,21 @@ public class Player : MonoBehaviour {
 				if(thudSound)
 					AudioSource.PlayClipAtPoint(thudSound, transform.position);
 		}
+
+		//else grounded
+		else
+		{
+			//if on planet, become child; inherit rotation
+			if (other.gameObject.tag == "Planet") 
+				transform.parent = other.transform;
+		}
+	}
+	
+	void OnCollisionExit2D(Collision2D other)
+	{
+		if(!grounded)
+			if(other.gameObject.tag == "Planet")
+				transform.parent = null;
 	}
 
 	void OnTriggerEnter2D(Collider2D other)
@@ -251,7 +280,7 @@ public class Player : MonoBehaviour {
 		{
 			print("Damaging");
 
-			health.value -= gasGiantDepleteSpeed;
+			if(health) health.value -= gasGiantDepleteSpeed;
 		}
 	}
 

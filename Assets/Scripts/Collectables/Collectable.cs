@@ -27,7 +27,12 @@ public class Collectable : MonoBehaviour {
 
 	void OnCollisionEnter2D(Collision2D other)
 	{
-		if(other.gameObject.tag == "Player")
+		if (other.gameObject.tag == "Planet") 
+		{
+			transform.parent = other.transform;
+		}
+
+		else if(other.gameObject.tag == "Player")
 		{
 			if(gameObject.tag == "Part")
 			{

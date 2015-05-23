@@ -58,7 +58,6 @@
      <Compile Include="Assets\Scripts\Player\Player.cs" />
      <Compile Include="Assets\Scripts\Player\PlayerInput.cs" />
      <Compile Include="Assets\Scripts\Player\SpriteRotation.cs" />
-     <Compile Include="Assets\Scripts\UI\DisplayScore.cs" />
      <Compile Include="Assets\Scripts\UI\SFX.cs" />
      <Compile Include="Assets\Scripts\UI\UIButtonHold.cs" />
      <None Include="Assets\Standard Assets\Effects\GlassRefraction\Shaders\GlassStainedBumpDistort.shader" />
