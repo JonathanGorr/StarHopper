@@ -9,13 +9,17 @@ public class LevelManager : MonoBehaviour {
 	[HideInInspector] public GameObject[] maxParts;
 
 	private Slider oxygenBar;
-	public float time = 60f;
 
-	public bool mobile;
+	//variables
+	public float 
+		time = 60f,
+		fadeSpeed = 1f;
 
+	//bools
 	private bool
-		paused,
 		mapOn = true;
+
+	[HideInInspector] public bool paused;
 
 	//UI
 	private GameObject
@@ -37,11 +41,14 @@ public class LevelManager : MonoBehaviour {
 		scoreText,
 		partsText;
 
+	//components
 	private PlayerInput input;
+	private Fading fader;
 
 	private void Awake()
 	{
 		//Find ui groups
+		fader = GetComponent<Fading> ();
 		input = GetComponent<PlayerInput> ();
 		gameUI = GameObject.Find("GameUI");
 		titleUI = GameObject.Find("TitleUI");
@@ -109,14 +116,10 @@ public class LevelManager : MonoBehaviour {
 	void Update()
 	{
 		//if not on mobile, hide touch controls
-		if (Application.platform != RuntimePlatform.WindowsPlayer)
-			controls.SetActive (false);
-		else
-			controls.SetActive (true);
+		controls.SetActive (Application.platform != RuntimePlatform.WindowsPlayer ? false : true);
 
 		//restart
-		if(input.restart)
-			Restart();
+		if(input.restart) StartRestart();
 
 		//esc to pause
 		if(input.pause)
@@ -124,10 +127,8 @@ public class LevelManager : MonoBehaviour {
 			//toggle
 			paused = !paused;
 
-			if(paused)
-				Pause();
-			else
-				UnPause();
+			if(paused) Pause();
+			else UnPause();
 		}
 	}
 
@@ -190,17 +191,19 @@ public class LevelManager : MonoBehaviour {
 	{
 		deathMessage.text = "You asphyxiated!";
 		GetComponent<PlayerInput> ().enabled = false;
-		Invoke("Restart", 2f);
+		Invoke("StartRestart", 2f);
 	}
 
 	public void Pause()
 	{
+		paused = true;
 		pauseMenu.SetActive(true);
 		Time.timeScale = 0;
 	}
 
 	public void UnPause()
 	{
+		paused = false;
 		pauseMenu.SetActive(false);
 		Time.timeScale = 1;
 	}
@@ -234,32 +237,50 @@ public class LevelManager : MonoBehaviour {
 	{
 		mapOn = !mapOn;
 
-		if(mapOn) miniMap.SetActive(true);
-
-		else miniMap.SetActive(false);
+		miniMap.SetActive(mapOn ? true : false);
 	}
 
-	public void Resume()
+	public void StartGoToMenu()
 	{
-		UnPause();
+		StartCoroutine ("GoToMenu");
 	}
 
-	public void GoToMenu()
+	public void StartRestart()
+	{
+		StartCoroutine ("Restart");
+	}
+
+	public void StartNextLevel()
+	{
+		StartCoroutine ("NextLevel");
+	}
+
+	public void StartQuit()
+	{
+		StartCoroutine ("Quit");
+	}
+
+	IEnumerator GoToMenu()
 	{
 		UnPause();
+		fader.BeginFade (1);
+		yield return new WaitForSeconds (fader.fadeSpeed);
 		Application.LoadLevel("Title");
 	}
 
-	public void Restart()
+	IEnumerator Restart()
 	{
 		UnPause();
+		fader.BeginFade (1);
+		yield return new WaitForSeconds (fader.fadeSpeed);
 		Application.LoadLevel(Application.loadedLevel);
 	}
 
-	public void NextLevel()
+	IEnumerator NextLevel()
 	{
 		UnPause();
-
+		fader.BeginFade (1);
+		yield return new WaitForSeconds (fader.fadeSpeed);
 		//if there is another level, load it, otherwise go to menu or, ideally, game over screen
 		if(Application.CanStreamedLevelBeLoaded(Application.loadedLevel + 1))
 			Application.LoadLevel(Application.loadedLevel + 1);
@@ -267,9 +288,11 @@ public class LevelManager : MonoBehaviour {
 			Application.LoadLevel("Title");
 	}
 
-	public void Quit()
+	IEnumerator Quit()
 	{
 		UnPause();
+		fader.BeginFade (1);
+		yield return new WaitForSeconds (fader.fadeSpeed);
 		Application.Quit();
 	}
 }

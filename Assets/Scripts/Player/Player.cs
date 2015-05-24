@@ -14,15 +14,18 @@ public class Player : MonoBehaviour {
 		fuelDepleteSpeed = 1f,
 		noAirDepleteSpeed = .2f,
 		gasGiantDepleteSpeed = .5f,
-		rotationSpeed = 2;
+		rotationSpeed = 2,
+		laserSpeed = 100f;
 
 	private float t;
 
 	//sounds
-	public AudioClip leftFootSound;
-	public AudioClip rightFootSound;
-	public AudioClip thudSound;
-	public AudioClip rocketSound;
+	public AudioClip 
+		leftFootSound,
+		rightFootSound,
+		thudSound,
+		rocketSound,
+		fireSound;
 
 	//bools
 	private bool grounded;
@@ -43,6 +46,9 @@ public class Player : MonoBehaviour {
 
 	//gameobjects
 	private GameObject playerCanvas;
+
+	//prefabs
+	public GameObject laser;
 
 	//bars
 	private Slider fuel, health;
@@ -91,9 +97,9 @@ public class Player : MonoBehaviour {
 		if(!planetRotate.tooFar)
 		{
 			//horizontal
-			if(input.left) 
+			if(input.left)
 				moving.x = -1;
-			else if(input.right) 
+			else if(input.right)
 				moving.x = 1;
 		}
 		
@@ -171,6 +177,22 @@ public class Player : MonoBehaviour {
 
 		if (health.value <= 0)
 			Kill ();
+
+		if(input.fire)
+			Fire();
+	}
+
+	void Fire()
+	{
+		Vector3 pos = Input.mousePosition;
+		pos.z = transform.position.z - Camera.main.transform.position.z;
+		pos = Camera.main.ScreenToWorldPoint(pos);
+
+		AudioSource.PlayClipAtPoint(fireSound, transform.position);
+		
+		Quaternion q = Quaternion.FromToRotation(Vector3.right, pos - transform.position);
+		GameObject go = Instantiate(laser, transform.position, q) as GameObject;
+		go.GetComponent<Rigidbody2D> ().AddForce(go.transform.right * laserSpeed);
 	}
 
 	void RecoverFuel()
@@ -244,12 +266,15 @@ public class Player : MonoBehaviour {
 		{
 			transform.parent = null;
 
-			float absVelX = Mathf.Abs(rigidBody.velocity.x);
-			float absVelY = Mathf.Abs(rigidBody.velocity.y);
+			if(rigidBody)
+			{
+				float absVelX = Mathf.Abs(rigidBody.velocity.x);
+				float absVelY = Mathf.Abs(rigidBody.velocity.y);
 
-			if(absVelX <= .1f || absVelY <= .1f)
-				if(thudSound)
-					AudioSource.PlayClipAtPoint(thudSound, transform.position);
+				if(absVelX <= .1f || absVelY <= .1f)
+					if(thudSound)
+						AudioSource.PlayClipAtPoint(thudSound, transform.position);
+			}
 		}
 
 		//else grounded
