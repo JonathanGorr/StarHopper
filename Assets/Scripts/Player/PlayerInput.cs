@@ -18,8 +18,6 @@ public class PlayerInput : MonoBehaviour {
 		restart,
 		fire;
 
-	public float rotationSpeed;
-
 	private LevelManager manager;
 
 	void Awake()

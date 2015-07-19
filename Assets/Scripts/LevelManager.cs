@@ -11,9 +11,8 @@ public class LevelManager : MonoBehaviour {
 	private Slider oxygenBar;
 
 	//variables
-	public float 
-		time = 60f,
-		fadeSpeed = 1f;
+	public float
+		time = 60f;
 
 	//bools
 	private bool
@@ -214,6 +213,11 @@ public class LevelManager : MonoBehaviour {
 			coins ++;
 		else if(name == "Parts")
 			parts++;
+	}
+
+	public void SubtractCoins(int value)
+	{
+		coins -= value;
 	}
 
 	//calculate how many more parts are needed

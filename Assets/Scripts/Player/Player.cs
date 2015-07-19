@@ -303,8 +303,6 @@ public class Player : MonoBehaviour {
 	{
 		if (other.gameObject.tag == "Damager") 
 		{
-			print("Damaging");
-
 			if(health) health.value -= gasGiantDepleteSpeed;
 		}
 	}

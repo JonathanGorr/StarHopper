@@ -47,7 +47,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\Camera\CameraSmoothFollow.cs" />
-     <Compile Include="Assets\Scripts\Camera\PinchZoom.cs" />
+     <Compile Include="Assets\Scripts\Camera\Zoom.cs" />
      <Compile Include="Assets\Scripts\Collectables\Collectable.cs" />
      <Compile Include="Assets\Scripts\Collectables\Laser.cs" />
      <Compile Include="Assets\Scripts\Collectables\SpawnInCircle.cs" />
@@ -57,9 +57,12 @@
      <Compile Include="Assets\Scripts\Gravity\RotateTowardsPlanet.cs" />
      <Compile Include="Assets\Scripts\HexGrid.cs" />
      <Compile Include="Assets\Scripts\LevelManager.cs" />
+     <Compile Include="Assets\Scripts\Planet.cs" />
      <Compile Include="Assets\Scripts\Player\Player.cs" />
      <Compile Include="Assets\Scripts\Player\PlayerInput.cs" />
      <Compile Include="Assets\Scripts\Player\SpriteRotation.cs" />
+     <Compile Include="Assets\Scripts\PlayerPreferences.cs" />
+     <Compile Include="Assets\Scripts\Price.cs" />
      <Compile Include="Assets\Scripts\UI\Fading.cs" />
      <Compile Include="Assets\Scripts\UI\SFX.cs" />
      <Compile Include="Assets\Scripts\UI\UIButtonHold.cs" />
